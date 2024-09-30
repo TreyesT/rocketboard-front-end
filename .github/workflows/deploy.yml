@@ -1,0 +1,30 @@
+name: Deploy Front-End to Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install SSH Key
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-known-hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+
+      - name: Deploy to Server
+        run: |
+          ssh admin_reyes@157.245.241.27 '
+            cd /home/rocketboardai/rocketboard-front-end &&
+            git pull &&
+            docker-compose down &&
+            docker-compose up -d --build
+          '
