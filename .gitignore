@@ -7,18 +7,20 @@ yarn-error.log*
 
 # Dependency directories
 node_modules/
+.pnp/
+.pnp.js
 
 # Build output
 dist/
 build/
 
 # Runtime data
-pids
+pids/
 *.pid
 *.seed
 *.pid.lock
 
-# Coverage directory used by tools like istanbul
+# Coverage directory used by tools like Istanbul
 coverage/
 
 # System files
@@ -33,5 +35,9 @@ Thumbs.db
 *.njsproj
 *.sln
 
-# Env files
+# Environment variable files
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
