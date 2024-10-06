@@ -50,7 +50,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchSalesData = async () => {
       try {
-        const response = await axios.get('/sales');
+        const response = await axios.get('/api/sales');
         setSalesData(response.data);
       } catch (err) {
         setError(err);
