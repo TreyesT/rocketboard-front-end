@@ -118,8 +118,10 @@ const Dashboard = () => {
 
   if (!salesData.length && !mergedData.length) return <div>Loading sales data...</div>;
 
+  const dataToUse = mergedData.length ? mergedData : salesData;
+
   // Sales Over Time Data
-  const salesOverTimeData = (mergedData.length ? mergedData : salesData).reduce((acc, sale) => {
+  const salesOverTimeData = dataToUse.reduce((acc, sale) => {
     const date = sale.date_of_sale;
     const salesAmount = sale.sales_amount;
 
@@ -144,7 +146,7 @@ const Dashboard = () => {
   };
 
   // Units Sold by Product Data
-  const unitsSoldData = (mergedData.length ? mergedData : salesData).reduce((acc, sale) => {
+  const unitsSoldData = dataToUse.reduce((acc, sale) => {
     const productName = sale.product_name;
     const unitsSold = sale.units_sold;
 
@@ -168,7 +170,7 @@ const Dashboard = () => {
   };
 
   // Sales by Customer Location (Pie Chart)
-  const salesByLocation = (mergedData.length ? mergedData : salesData).reduce((acc, sale) => {
+  const salesByLocation = dataToUse.reduce((acc, sale) => {
     const location = sale.customer.location;
     if (!acc[location]) {
       acc[location] = 0;
@@ -195,7 +197,7 @@ const Dashboard = () => {
   };
 
   // Sales by Gender (Doughnut Chart)
-  const salesByGender = (mergedData.length ? mergedData : salesData).reduce((acc, sale) => {
+  const salesByGender = dataToUse.reduce((acc, sale) => {
     const gender = sale.customer.gender;
     if (!acc[gender]) {
       acc[gender] = 0;
