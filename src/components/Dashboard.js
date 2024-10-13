@@ -24,17 +24,14 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  ArcElement
+  ArcElement // for pie and doughnut charts
 );
 
 const Dashboard = () => {
   const [salesData, setSalesData] = useState([]);
-  const [mergedData, setMergedData] = useState([]);
-  const [file, setFile] = useState(null);
-  const [mergeStatus, setMergeStatus] = useState(null);
-  const [backupOptions, setBackupOptions] = useState([]);
-  const [backupName, setBackupName] = useState('');
-  const [restoreStatus, setRestoreStatus] = useState('');
+  const [error, setError] = useState(null);
+
+  // State to manage checkbox visibility
   const [showCharts, setShowCharts] = useState({
     showLineChart: true,
     showBarChart: true,
@@ -42,72 +39,6 @@ const Dashboard = () => {
     showDoughnutChart: true,
   });
 
-  // Fetch sales data
-  useEffect(() => {
-    const fetchSalesData = async () => {
-      try {
-        const response = await axios.get('/api/sales');
-        setSalesData(response.data);
-      } catch (err) {
-        console.error('Error fetching sales data:', err);
-      }
-    };
-    fetchSalesData();
-  }, []);
-
-  // Fetch available backups
-  useEffect(() => {
-    const fetchBackups = async () => {
-      try {
-        const response = await axios.get('/api/list-backups');
-        setBackupOptions(response.data.backups);
-      } catch (err) {
-        console.error('Error fetching backups:', err);
-      }
-    };
-    fetchBackups();
-  }, []);
-
-  // Handle file selection
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
-
-  // Handle upload and merge
-  const handleUpload = async () => {
-    if (!file) {
-      setMergeStatus('Please select a file to upload.');
-      return;
-    }
-    const formData = new FormData();
-    formData.append('file', file);
-    try {
-      const uploadResponse = await axios.post('/api/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      setMergeStatus(`Success: ${uploadResponse.data.message}`);
-    } catch (error) {
-      setMergeStatus('Error: ' + error.message);
-    }
-  };
-
-  // Restore backup functionality
-  const handleRestoreBackup = async () => {
-    if (!backupName) {
-      setRestoreStatus('Please select a backup to restore.');
-      return;
-    }
-    try {
-      const response = await axios.post('/api/restore-backup', {
-        backup_name: backupName,
-      });
-      setRestoreStatus(response.data.message);
-    } catch (error) {
-      setRestoreStatus('Error restoring backup: ' + error.message);
-    }
-  };
-
-  // Handle chart visibility
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
     setShowCharts((prevState) => ({
@@ -116,10 +47,23 @@ const Dashboard = () => {
     }));
   };
 
-  if (!salesData.length && !mergedData.length) return <div>Loading sales data...</div>;
+  useEffect(() => {
+    const fetchSalesData = async () => {
+      try {
+        const response = await axios.get('/api/sales');
+        setSalesData(response.data);
+      } catch (err) {
+        setError(err);
+      }
+    };
+
+    fetchSalesData();
+  }, []);
+
+  if (error) return <div>Error: {error.message}</div>;
 
   // Sales Over Time Data
-  const salesOverTimeData = (mergedData.length ? mergedData : salesData).reduce((acc, sale) => {
+  const salesOverTimeData = salesData.reduce((acc, sale) => {
     const date = sale.date_of_sale;
     const salesAmount = sale.sales_amount;
 
@@ -144,7 +88,7 @@ const Dashboard = () => {
   };
 
   // Units Sold by Product Data
-  const unitsSoldData = (mergedData.length ? mergedData : salesData).reduce((acc, sale) => {
+  const unitsSoldData = salesData.reduce((acc, sale) => {
     const productName = sale.product_name;
     const unitsSold = sale.units_sold;
 
@@ -168,7 +112,7 @@ const Dashboard = () => {
   };
 
   // Sales by Customer Location (Pie Chart)
-  const salesByLocation = (mergedData.length ? mergedData : salesData).reduce((acc, sale) => {
+  const salesByLocation = salesData.reduce((acc, sale) => {
     const location = sale.customer.location;
     if (!acc[location]) {
       acc[location] = 0;
@@ -195,7 +139,7 @@ const Dashboard = () => {
   };
 
   // Sales by Gender (Doughnut Chart)
-  const salesByGender = (mergedData.length ? mergedData : salesData).reduce((acc, sale) => {
+  const salesByGender = salesData.reduce((acc, sale) => {
     const gender = sale.customer.gender;
     if (!acc[gender]) {
       acc[gender] = 0;
@@ -218,29 +162,7 @@ const Dashboard = () => {
   return (
     <div>
       <h1>Sales Dashboard</h1>
-
-      {/* File upload UI */}
-      <div>
-        <input type="file" onChange={handleFileChange} />
-        <button onClick={handleUpload}>Upload and Merge Data</button>
-        {mergeStatus && <p>{mergeStatus}</p>}
-      </div>
-
-      {/* Backup and Restore functionality */}
-      <div>
-        <h2>Restore Previous Backup</h2>
-        <select value={backupName} onChange={(e) => setBackupName(e.target.value)}>
-          <option value="">Select a backup</option>
-          {backupOptions.map((backup) => (
-            <option key={backup} value={backup}>
-              {backup}
-            </option>
-          ))}
-        </select>
-        <button onClick={handleRestoreBackup}>Restore Backup</button>
-        {restoreStatus && <p>{restoreStatus}</p>}
-      </div>
-
+      
       {/* Checkboxes for toggling graphs */}
       <div>
         <label>
