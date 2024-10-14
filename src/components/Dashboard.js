@@ -39,6 +39,74 @@ const Dashboard = () => {
     showDoughnutChart: true,
   });
 
+
+  // Fetch sales data
+  useEffect(() => {
+    const fetchSalesData = async () => {
+      try {
+        const response = await axios.get('http://127.0.0.1:5000/sales');
+        setSalesData(response.data);
+      } catch (err) {
+        console.error('Error fetching sales data:', err);
+      }
+    };
+    fetchSalesData();
+  }, []);
+
+  // Fetch available backups
+  useEffect(() => {
+    const fetchBackups = async () => {
+      try {
+        const response = await axios.get('http://127.0.0.1:5000/list-backups');
+        setBackupOptions(response.data.backups);
+      } catch (err) {
+        console.error('Error fetching backups:', err);
+      }
+    };
+    fetchBackups();
+  }, []);
+
+  // Handle file selection
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  // Handle upload and merge
+  const handleUpload = async () => {
+    if (!file) {
+      setMergeStatus('Please select a file to upload.');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const uploadResponse = await axios.post('http://127.0.0.1:5000/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setMergeStatus(`Success: ${uploadResponse.data.message}`);
+    } catch (error) {
+      setMergeStatus('Error: ' + error.message);
+    }
+  };
+
+  // Restore backup functionality
+  const handleRestoreBackup = async () => {
+    if (!backupName) {
+      setRestoreStatus('Please select a backup to restore.');
+      return;
+    }
+    try {
+      const response = await axios.post('http://127.0.0.1:5000/restore-backup', {
+        backup_name: backupName,
+      });
+      setRestoreStatus(response.data.message);
+    } catch (error) {
+      setRestoreStatus('Error restoring backup: ' + error.message);
+    }
+  };
+
+  // Handle chart visibility
+
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
     setShowCharts((prevState) => ({
@@ -63,7 +131,7 @@ const Dashboard = () => {
   if (error) return <div>Error: {error.message}</div>;
 
   // Sales Over Time Data
-  const salesOverTimeData = salesData.reduce((acc, sale) => {
+  const salesOverTimeData = (mergedData.length ? mergedData : salesData).reduce((acc, sale) => {
     const date = sale.date_of_sale;
     const salesAmount = sale.sales_amount;
 
@@ -88,7 +156,7 @@ const Dashboard = () => {
   };
 
   // Units Sold by Product Data
-  const unitsSoldData = salesData.reduce((acc, sale) => {
+  const unitsSoldData = (mergedData.length ? mergedData : salesData).reduce((acc, sale) => {
     const productName = sale.product_name;
     const unitsSold = sale.units_sold;
 
@@ -112,7 +180,7 @@ const Dashboard = () => {
   };
 
   // Sales by Customer Location (Pie Chart)
-  const salesByLocation = salesData.reduce((acc, sale) => {
+  const salesByLocation = (mergedData.length ? mergedData : salesData).reduce((acc, sale) => {
     const location = sale.customer.location;
     if (!acc[location]) {
       acc[location] = 0;
@@ -139,7 +207,7 @@ const Dashboard = () => {
   };
 
   // Sales by Gender (Doughnut Chart)
-  const salesByGender = salesData.reduce((acc, sale) => {
+  const salesByGender = (mergedData.length ? mergedData : salesData).reduce((acc, sale) => {
     const gender = sale.customer.gender;
     if (!acc[gender]) {
       acc[gender] = 0;
