@@ -24,14 +24,17 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  ArcElement // for pie and doughnut charts
+  ArcElement
 );
 
 const Dashboard = () => {
   const [salesData, setSalesData] = useState([]);
-  const [error, setError] = useState(null);
-
-  // State to manage checkbox visibility
+  const [mergedData, setMergedData] = useState([]);
+  const [file, setFile] = useState(null);
+  const [mergeStatus, setMergeStatus] = useState(null);
+  const [backupOptions, setBackupOptions] = useState([]);
+  const [backupName, setBackupName] = useState('');
+  const [restoreStatus, setRestoreStatus] = useState('');
   const [showCharts, setShowCharts] = useState({
     showLineChart: true,
     showBarChart: true,
@@ -39,12 +42,11 @@ const Dashboard = () => {
     showDoughnutChart: true,
   });
 
-
   // Fetch sales data
   useEffect(() => {
     const fetchSalesData = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:5000/sales');
+        const response = await axios.get('/api/sales');
         setSalesData(response.data);
       } catch (err) {
         console.error('Error fetching sales data:', err);
@@ -57,7 +59,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchBackups = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:5000/list-backups');
+        const response = await axios.get('/api/list-backups');
         setBackupOptions(response.data.backups);
       } catch (err) {
         console.error('Error fetching backups:', err);
@@ -80,10 +82,12 @@ const Dashboard = () => {
     const formData = new FormData();
     formData.append('file', file);
     try {
-      const uploadResponse = await axios.post('http://127.0.0.1:5000/upload', formData, {
+      const uploadResponse = await axios.post('/api/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setMergeStatus(`Success: ${uploadResponse.data.message}`);
+      // Update mergedData with the new data from the server
+      setMergedData(uploadResponse.data.mergedData);
     } catch (error) {
       setMergeStatus('Error: ' + error.message);
     }
@@ -96,17 +100,20 @@ const Dashboard = () => {
       return;
     }
     try {
-      const response = await axios.post('http://127.0.0.1:5000/restore-backup', {
+      const response = await axios.post('/api/restore-backup', {
         backup_name: backupName,
       });
       setRestoreStatus(response.data.message);
+      // Update salesData with the restored data
+      setSalesData(response.data.restoredData);
+      // Clear mergedData as we've restored to a backup
+      setMergedData([]);
     } catch (error) {
       setRestoreStatus('Error restoring backup: ' + error.message);
     }
   };
 
   // Handle chart visibility
-
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
     setShowCharts((prevState) => ({
@@ -115,23 +122,12 @@ const Dashboard = () => {
     }));
   };
 
-  useEffect(() => {
-    const fetchSalesData = async () => {
-      try {
-        const response = await axios.get('/api/sales');
-        setSalesData(response.data);
-      } catch (err) {
-        setError(err);
-      }
-    };
+  if (!salesData.length && !mergedData.length) return <div>Loading sales data...</div>;
 
-    fetchSalesData();
-  }, []);
-
-  if (error) return <div>Error: {error.message}</div>;
+  const dataToUse = mergedData.length ? mergedData : salesData;
 
   // Sales Over Time Data
-  const salesOverTimeData = (mergedData.length ? mergedData : salesData).reduce((acc, sale) => {
+  const salesOverTimeData = dataToUse.reduce((acc, sale) => {
     const date = sale.date_of_sale;
     const salesAmount = sale.sales_amount;
 
@@ -156,7 +152,7 @@ const Dashboard = () => {
   };
 
   // Units Sold by Product Data
-  const unitsSoldData = (mergedData.length ? mergedData : salesData).reduce((acc, sale) => {
+  const unitsSoldData = dataToUse.reduce((acc, sale) => {
     const productName = sale.product_name;
     const unitsSold = sale.units_sold;
 
@@ -180,7 +176,7 @@ const Dashboard = () => {
   };
 
   // Sales by Customer Location (Pie Chart)
-  const salesByLocation = (mergedData.length ? mergedData : salesData).reduce((acc, sale) => {
+  const salesByLocation = dataToUse.reduce((acc, sale) => {
     const location = sale.customer.location;
     if (!acc[location]) {
       acc[location] = 0;
@@ -207,7 +203,7 @@ const Dashboard = () => {
   };
 
   // Sales by Gender (Doughnut Chart)
-  const salesByGender = (mergedData.length ? mergedData : salesData).reduce((acc, sale) => {
+  const salesByGender = dataToUse.reduce((acc, sale) => {
     const gender = sale.customer.gender;
     if (!acc[gender]) {
       acc[gender] = 0;
@@ -230,7 +226,29 @@ const Dashboard = () => {
   return (
     <div>
       <h1>Sales Dashboard</h1>
-      
+
+      {/* File upload UI */}
+      <div>
+        <input type="file" onChange={handleFileChange} />
+        <button onClick={handleUpload}>Upload and Merge Data</button>
+        {mergeStatus && <p>{mergeStatus}</p>}
+      </div>
+
+      {/* Backup and Restore functionality */}
+      <div>
+        <h2>Restore Previous Backup</h2>
+        <select value={backupName} onChange={(e) => setBackupName(e.target.value)}>
+          <option value="">Select a backup</option>
+          {backupOptions.map((backup) => (
+            <option key={backup} value={backup}>
+              {backup}
+            </option>
+          ))}
+        </select>
+        <button onClick={handleRestoreBackup}>Restore Backup</button>
+        {restoreStatus && <p>{restoreStatus}</p>}
+      </div>
+
       {/* Checkboxes for toggling graphs */}
       <div>
         <label>
