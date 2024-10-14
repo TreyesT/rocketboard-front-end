@@ -86,6 +86,8 @@ const Dashboard = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setMergeStatus(`Success: ${uploadResponse.data.message}`);
+      // Update mergedData with the new data from the server
+      setMergedData(uploadResponse.data.mergedData);
     } catch (error) {
       setMergeStatus('Error: ' + error.message);
     }
@@ -102,6 +104,10 @@ const Dashboard = () => {
         backup_name: backupName,
       });
       setRestoreStatus(response.data.message);
+      // Update salesData with the restored data
+      setSalesData(response.data.restoredData);
+      // Clear mergedData as we've restored to a backup
+      setMergedData([]);
     } catch (error) {
       setRestoreStatus('Error restoring backup: ' + error.message);
     }
