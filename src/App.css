@@ -58,20 +58,36 @@ h1, h2 {
   background-color: #4e5d7f;
 }
 
-/* Updated chart-box to prevent growing beyond screen size */
+/* Updated chart-box with dynamic height and width */
 .chart-box {
   background-color: #262C48;
   border-radius: 8px;
   padding: 16px;
   color: white;
-  width: 48%; /* Adjusted to make them bigger */
-  height: 400px; /* Set a fixed height for larger charts */
-  max-height: 400px;
-  overflow: hidden; /* Ensures content doesn’t overflow */
-  box-sizing: border-box; /* Ensures padding is included in width/height */
+  width: auto; /* Adjust width to the graph content */
+  height: auto; /* Adjust height based on content */
+  max-width: 100%; /* Ensure it doesn't go beyond screen */
+  max-height: 90vh; /* Limit height to prevent overflowing the screen */
   margin-bottom: 16px;
+  box-sizing: border-box; /* Ensure padding is included in width/height */
 }
 
+/* Flexbox layout with wrapping */
+.charts-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start; /* Allows boxes to grow vertically without stretching */
+}
+
+/* Ensure charts maintain their aspect ratio and don’t stretch */
+.chart-box canvas {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 100%; /* Ensure chart doesn't overflow its container */
+}
+
+/* Checkboxes styling */
 .checkbox-section label {
   display: block;
   margin-bottom: 8px;
@@ -79,18 +95,4 @@ h1, h2 {
 
 .checkbox-section input[type="checkbox"] {
   margin-right: 8px;
-}
-
-/* Updated layout to use flexbox for better control over sizing */
-.charts-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
-
-/* Constrain charts' width and height */
-.chart-box canvas {
-  width: 100% !important;
-  height: 100% !important;
-  max-height: 100%; /* Prevent charts from exceeding the box height */
 }
