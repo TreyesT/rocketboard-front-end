@@ -64,8 +64,9 @@ h1, h2 {
   border-radius: 8px;
   padding: 16px;
   color: white;
-  max-width: 45%; /* Prevents box from getting too wide */
-  max-height: 400px; /* Limits the height */
+  width: 48%; /* Adjusted to make them bigger */
+  height: 400px; /* Set a fixed height for larger charts */
+  max-height: 400px;
   overflow: hidden; /* Ensures content doesn’t overflow */
   box-sizing: border-box; /* Ensures padding is included in width/height */
   margin-bottom: 16px;
@@ -80,16 +81,16 @@ h1, h2 {
   margin-right: 8px;
 }
 
-/* New styles for the charts grid */
+/* Updated layout to use flexbox for better control over sizing */
 .charts-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-gap: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 /* Constrain charts' width and height */
 .chart-box canvas {
   width: 100% !important;
-  height: auto !important;
-  max-height: 400px; /* Prevent charts from exceeding the box height */
+  height: 100% !important;
+  max-height: 100%; /* Prevent charts from exceeding the box height */
 }
