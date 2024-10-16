@@ -1,3 +1,4 @@
+// Dashboard.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Line, Bar, Pie, Doughnut } from 'react-chartjs-2';
@@ -14,18 +15,24 @@ import {
   ArcElement,
 } from 'chart.js';
 
+import { Responsive, WidthProvider } from 'react-grid-layout';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
+
 // Register the components
 ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+    ArcElement
 );
+
+const ResponsiveGridLayout = WidthProvider(Responsive);
 
 const Dashboard = () => {
   const [salesData, setSalesData] = useState([]);
@@ -86,7 +93,6 @@ const Dashboard = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setMergeStatus(`Success: ${uploadResponse.data.message}`);
-      // Update mergedData with the new data from the server
       setMergedData(uploadResponse.data.mergedData);
     } catch (error) {
       setMergeStatus('Error: ' + error.message);
@@ -104,9 +110,7 @@ const Dashboard = () => {
         backup_name: backupName,
       });
       setRestoreStatus(response.data.message);
-      // Update salesData with the restored data
       setSalesData(response.data.restoredData);
-      // Clear mergedData as we've restored to a backup
       setMergedData([]);
     } catch (error) {
       setRestoreStatus('Error restoring backup: ' + error.message);
@@ -223,103 +227,118 @@ const Dashboard = () => {
     ],
   };
 
+  const layouts = {
+    lg: [
+      { i: 'lineChart', x: 0, y: 0, w: 6, h: 4 },
+      { i: 'barChart', x: 6, y: 0, w: 6, h: 4 },
+      { i: 'pieChart', x: 0, y: 4, w: 6, h: 4 },
+      { i: 'doughnutChart', x: 6, y: 4, w: 6, h: 4 },
+    ],
+    // Add other layouts for different breakpoints if needed
+  };
+
   return (
-    <div>
-      <h1>Sales Dashboard</h1>
+      <div className="dashboard-container">
+        <h1>Sales Dashboard</h1>
 
-      {/* File upload UI */}
-      <div>
-        <input type="file" onChange={handleFileChange} />
-        <button onClick={handleUpload}>Upload and Merge Data</button>
-        {mergeStatus && <p>{mergeStatus}</p>}
-      </div>
+        {/* File upload UI */}
+        <div className="upload-section">
+          <input type="file" onChange={handleFileChange} />
+          <button className="button" onClick={handleUpload}>Upload and Merge Data</button>
+          {mergeStatus && <p>{mergeStatus}</p>}
+        </div>
 
-      {/* Backup and Restore functionality */}
-      <div>
-        <h2>Restore Previous Backup</h2>
-        <select value={backupName} onChange={(e) => setBackupName(e.target.value)}>
-          <option value="">Select a backup</option>
-          {backupOptions.map((backup) => (
-            <option key={backup} value={backup}>
-              {backup}
-            </option>
-          ))}
-        </select>
-        <button onClick={handleRestoreBackup}>Restore Backup</button>
-        {restoreStatus && <p>{restoreStatus}</p>}
-      </div>
+        {/* Backup and Restore functionality */}
+        <div className="backup-section">
+          <h2>Restore Previous Backup</h2>
+          <select value={backupName} onChange={(e) => setBackupName(e.target.value)}>
+            <option value="">Select a backup</option>
+            {backupOptions.map((backup) => (
+                <option key={backup} value={backup}>
+                  {backup}
+                </option>
+            ))}
+          </select>
+          <button className="button" onClick={handleRestoreBackup}>Restore Backup</button>
+          {restoreStatus && <p>{restoreStatus}</p>}
+        </div>
 
-      {/* Checkboxes for toggling graphs */}
-      <div>
-        <label>
-          <input
-            type="checkbox"
-            name="showLineChart"
-            checked={showCharts.showLineChart}
-            onChange={handleCheckboxChange}
-          />
-          Show Sales Over Time
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            name="showBarChart"
-            checked={showCharts.showBarChart}
-            onChange={handleCheckboxChange}
-          />
-          Show Units Sold by Product
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            name="showPieChart"
-            checked={showCharts.showPieChart}
-            onChange={handleCheckboxChange}
-          />
-          Show Sales by Location
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            name="showDoughnutChart"
-            checked={showCharts.showDoughnutChart}
-            onChange={handleCheckboxChange}
-          />
-          Show Sales by Gender
-        </label>
-      </div>
+        {/* Checkboxes for toggling graphs */}
+        <div className="checkbox-section">
+          <label>
+            <input
+                type="checkbox"
+                name="showLineChart"
+                checked={showCharts.showLineChart}
+                onChange={handleCheckboxChange}
+            />
+            Show Sales Over Time
+          </label>
+          <label>
+            <input
+                type="checkbox"
+                name="showBarChart"
+                checked={showCharts.showBarChart}
+                onChange={handleCheckboxChange}
+            />
+            Show Units Sold by Product
+          </label>
+          <label>
+            <input
+                type="checkbox"
+                name="showPieChart"
+                checked={showCharts.showPieChart}
+                onChange={handleCheckboxChange}
+            />
+            Show Sales by Location
+          </label>
+          <label>
+            <input
+                type="checkbox"
+                name="showDoughnutChart"
+                checked={showCharts.showDoughnutChart}
+                onChange={handleCheckboxChange}
+            />
+            Show Sales by Gender
+          </label>
+        </div>
 
-      {/* Conditional rendering of charts based on checkbox state */}
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        {showCharts.showLineChart && (
-          <div style={{ width: '45%' }}>
-            <h2>Sales Over Time</h2>
-            <Line data={lineChartData} />
-          </div>
-        )}
-        {showCharts.showBarChart && (
-          <div style={{ width: '45%' }}>
-            <h2>Units Sold by Product</h2>
-            <Bar data={barChartData} />
-          </div>
-        )}
+        {/* Chart Grid */}
+        <ResponsiveGridLayout
+            className="layout"
+            layouts={layouts}
+            breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+            cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+            rowHeight={30}
+            isDraggable={true}
+            isResizable={true}
+        >
+          {showCharts.showLineChart && (
+              <div key="lineChart" className="chart-box">
+                <h2>Sales Over Time</h2>
+                <Line data={lineChartData} />
+              </div>
+          )}
+          {showCharts.showBarChart && (
+              <div key="barChart" className="chart-box">
+                <h2>Units Sold by Product</h2>
+                <Bar data={barChartData} />
+              </div>
+          )}
+          {showCharts.showPieChart && (
+              <div key="pieChart" className="chart-box">
+                <h2>Sales by Location</h2>
+                <Pie data={pieChartData} />
+              </div>
+          )}
+          {showCharts.showDoughnutChart && (
+              <div key="doughnutChart" className="chart-box">
+                <h2>Sales by Gender</h2>
+                <Doughnut data={doughnutChartData} />
+              </div>
+          )}
+        </ResponsiveGridLayout>
       </div>
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-        {showCharts.showPieChart && (
-          <div style={{ width: '45%' }}>
-            <h2>Sales by Location</h2>
-            <Pie data={pieChartData} />
-          </div>
-        )}
-        {showCharts.showDoughnutChart && (
-          <div style={{ width: '45%' }}>
-            <h2>Sales by Gender</h2>
-            <Doughnut data={doughnutChartData} />
-          </div>
-        )}
-      </div>
-    </div>
   );
 };
 
