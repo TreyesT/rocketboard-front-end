@@ -13,18 +13,21 @@ body {
   padding: 16px;
 }
 
-h1, h2 {
+h1,
+h2 {
   color: white;
 }
 
-.upload-section, .backup-section, .checkbox-section {
+.upload-section,
+.backup-section,
+.checkbox-section {
   background-color: #262C48;
   padding: 16px;
   border-radius: 8px;
   margin-bottom: 16px;
 }
 
-.upload-section input[type="file"],
+.upload-section input[type='file'],
 .backup-section select {
   background-color: #1B1E32;
   color: white;
@@ -34,7 +37,7 @@ h1, h2 {
   margin-right: 8px;
 }
 
-.upload-section input[type="file"]::file-selector-button {
+.upload-section input[type='file']::file-selector-button {
   background-color: #262C48;
   color: white;
   border: none;
@@ -70,6 +73,17 @@ h1, h2 {
   margin-bottom: 8px;
 }
 
-.checkbox-section input[type="checkbox"] {
+.checkbox-section input[type='checkbox'] {
   margin-right: 8px;
+}
+
+/* New styles for the charts grid */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 16px;
+}
+
+.chart-box {
+  width: 100%;
 }
