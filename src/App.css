@@ -13,21 +13,18 @@ body {
   padding: 16px;
 }
 
-h1,
-h2 {
+h1, h2 {
   color: white;
 }
 
-.upload-section,
-.backup-section,
-.checkbox-section {
+.upload-section, .backup-section, .checkbox-section {
   background-color: #262C48;
   padding: 16px;
   border-radius: 8px;
   margin-bottom: 16px;
 }
 
-.upload-section input[type='file'],
+.upload-section input[type="file"],
 .backup-section select {
   background-color: #1B1E32;
   color: white;
@@ -37,7 +34,7 @@ h2 {
   margin-right: 8px;
 }
 
-.upload-section input[type='file']::file-selector-button {
+.upload-section input[type="file"]::file-selector-button {
   background-color: #262C48;
   color: white;
   border: none;
@@ -61,11 +58,17 @@ h2 {
   background-color: #4e5d7f;
 }
 
+/* Updated chart-box to prevent growing beyond screen size */
 .chart-box {
   background-color: #262C48;
   border-radius: 8px;
   padding: 16px;
   color: white;
+  max-width: 45%; /* Prevents box from getting too wide */
+  max-height: 400px; /* Limits the height */
+  overflow: hidden; /* Ensures content doesn’t overflow */
+  box-sizing: border-box; /* Ensures padding is included in width/height */
+  margin-bottom: 16px;
 }
 
 .checkbox-section label {
@@ -73,7 +76,7 @@ h2 {
   margin-bottom: 8px;
 }
 
-.checkbox-section input[type='checkbox'] {
+.checkbox-section input[type="checkbox"] {
   margin-right: 8px;
 }
 
@@ -84,6 +87,9 @@ h2 {
   grid-gap: 16px;
 }
 
-.chart-box {
-  width: 100%;
+/* Constrain charts' width and height */
+.chart-box canvas {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 400px; /* Prevent charts from exceeding the box height */
 }
