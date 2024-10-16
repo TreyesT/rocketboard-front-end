@@ -15,9 +15,7 @@ import {
   ArcElement,
 } from 'chart.js';
 
-import { Responsive, WidthProvider } from 'react-grid-layout';
-import 'react-grid-layout/css/styles.css';
-import 'react-resizable/css/styles.css';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 // Register the components
 ChartJS.register(
@@ -31,8 +29,6 @@ ChartJS.register(
     Legend,
     ArcElement
 );
-
-const ResponsiveGridLayout = WidthProvider(Responsive);
 
 const Dashboard = () => {
   const [salesData, setSalesData] = useState([]);
@@ -48,6 +44,14 @@ const Dashboard = () => {
     showPieChart: true,
     showDoughnutChart: true,
   });
+
+  // State to manage the order of the charts
+  const [chartsOrder, setChartsOrder] = useState([
+    'lineChart',
+    'barChart',
+    'pieChart',
+    'doughnutChart',
+  ]);
 
   // Fetch sales data
   useEffect(() => {
@@ -126,7 +130,17 @@ const Dashboard = () => {
     }));
   };
 
-  if (!salesData.length && !mergedData.length) return <div>Loading sales data...</div>;
+  // Handle drag and drop
+  const onDragEnd = (result) => {
+    if (!result.destination) return;
+    const newOrder = Array.from(chartsOrder);
+    const [movedItem] = newOrder.splice(result.source.index, 1);
+    newOrder.splice(result.destination.index, 0, movedItem);
+    setChartsOrder(newOrder);
+  };
+
+  if (!salesData.length && !mergedData.length)
+    return <div>Loading sales data...</div>;
 
   const dataToUse = mergedData.length ? mergedData : salesData;
 
@@ -227,15 +241,34 @@ const Dashboard = () => {
     ],
   };
 
-  const layouts = {
-    lg: [
-      { i: 'lineChart', x: 0, y: 0, w: 6, h: 4 },
-      { i: 'barChart', x: 6, y: 0, w: 6, h: 4 },
-      { i: 'pieChart', x: 0, y: 4, w: 6, h: 4 },
-      { i: 'doughnutChart', x: 6, y: 4, w: 6, h: 4 },
-    ],
-    // Add other layouts for different breakpoints if needed
+  // Chart components mapping
+  const chartComponents = {
+    lineChart: {
+      component: <Line data={lineChartData} />,
+      title: 'Sales Over Time',
+      visible: showCharts.showLineChart,
+    },
+    barChart: {
+      component: <Bar data={barChartData} />,
+      title: 'Units Sold by Product',
+      visible: showCharts.showBarChart,
+    },
+    pieChart: {
+      component: <Pie data={pieChartData} />,
+      title: 'Sales by Location',
+      visible: showCharts.showPieChart,
+    },
+    doughnutChart: {
+      component: <Doughnut data={doughnutChartData} />,
+      title: 'Sales by Gender',
+      visible: showCharts.showDoughnutChart,
+    },
   };
+
+  // Filter charts that are visible
+  const visibleCharts = chartsOrder.filter(
+      (chartKey) => chartComponents[chartKey].visible
+  );
 
   return (
       <div className="dashboard-container">
@@ -244,14 +277,19 @@ const Dashboard = () => {
         {/* File upload UI */}
         <div className="upload-section">
           <input type="file" onChange={handleFileChange} />
-          <button className="button" onClick={handleUpload}>Upload and Merge Data</button>
+          <button className="button" onClick={handleUpload}>
+            Upload and Merge Data
+          </button>
           {mergeStatus && <p>{mergeStatus}</p>}
         </div>
 
         {/* Backup and Restore functionality */}
         <div className="backup-section">
           <h2>Restore Previous Backup</h2>
-          <select value={backupName} onChange={(e) => setBackupName(e.target.value)}>
+          <select
+              value={backupName}
+              onChange={(e) => setBackupName(e.target.value)}
+          >
             <option value="">Select a backup</option>
             {backupOptions.map((backup) => (
                 <option key={backup} value={backup}>
@@ -259,7 +297,9 @@ const Dashboard = () => {
                 </option>
             ))}
           </select>
-          <button className="button" onClick={handleRestoreBackup}>Restore Backup</button>
+          <button className="button" onClick={handleRestoreBackup}>
+            Restore Backup
+          </button>
           {restoreStatus && <p>{restoreStatus}</p>}
         </div>
 
@@ -303,41 +343,35 @@ const Dashboard = () => {
           </label>
         </div>
 
-        {/* Chart Grid */}
-        <ResponsiveGridLayout
-            className="layout"
-            layouts={layouts}
-            breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-            cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-            rowHeight={30}
-            isDraggable={true}
-            isResizable={true}
-        >
-          {showCharts.showLineChart && (
-              <div key="lineChart" className="chart-box">
-                <h2>Sales Over Time</h2>
-                <Line data={lineChartData} />
-              </div>
-          )}
-          {showCharts.showBarChart && (
-              <div key="barChart" className="chart-box">
-                <h2>Units Sold by Product</h2>
-                <Bar data={barChartData} />
-              </div>
-          )}
-          {showCharts.showPieChart && (
-              <div key="pieChart" className="chart-box">
-                <h2>Sales by Location</h2>
-                <Pie data={pieChartData} />
-              </div>
-          )}
-          {showCharts.showDoughnutChart && (
-              <div key="doughnutChart" className="chart-box">
-                <h2>Sales by Gender</h2>
-                <Doughnut data={doughnutChartData} />
-              </div>
-          )}
-        </ResponsiveGridLayout>
+        {/* Drag and Drop Context */}
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="charts" direction="horizontal">
+            {(provided) => (
+                <div
+                    className="charts-grid"
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                >
+                  {visibleCharts.map((chartKey, index) => (
+                      <Draggable key={chartKey} draggableId={chartKey} index={index}>
+                        {(provided) => (
+                            <div
+                                className="chart-box"
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                            >
+                              <h2>{chartComponents[chartKey].title}</h2>
+                              {chartComponents[chartKey].component}
+                            </div>
+                        )}
+                      </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+            )}
+          </Droppable>
+        </DragDropContext>
       </div>
   );
 };
