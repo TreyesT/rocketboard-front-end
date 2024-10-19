@@ -1,4 +1,4 @@
-// Dashboard.js
+// src/components/Dashboard.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Line, Bar, Pie, Doughnut } from 'react-chartjs-2';
@@ -14,8 +14,9 @@ import {
   Legend,
   ArcElement,
 } from 'chart.js';
-
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import SideMenu from './SideMenu'; // Import the SideMenu component
+import './Dashboard.css';
 
 // Register the components
 ChartJS.register(
@@ -44,6 +45,7 @@ const Dashboard = () => {
     showPieChart: true,
     showDoughnutChart: true,
   });
+  const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
 
   // State to manage the order of the charts
   const [chartsOrder, setChartsOrder] = useState([
@@ -272,80 +274,33 @@ const Dashboard = () => {
 
   return (
       <div className="dashboard-container">
+        {/* Menu Button */}
+        <button className="menu-button" onClick={() => setIsSideMenuOpen(true)}>
+          &#9776;
+        </button>
+
         <h1>Sales Dashboard</h1>
 
-        {/* File upload UI */}
-        <div className="upload-section">
-          <input type="file" onChange={handleFileChange} />
-          <button className="button" onClick={handleUpload}>
-            Upload and Merge Data
-          </button>
-          {mergeStatus && <p>{mergeStatus}</p>}
-        </div>
-
-        {/* Backup and Restore functionality */}
-        <div className="backup-section">
-          <h2>Restore Previous Backup</h2>
-          <select
-              value={backupName}
-              onChange={(e) => setBackupName(e.target.value)}
-          >
-            <option value="">Select a backup</option>
-            {backupOptions.map((backup) => (
-                <option key={backup} value={backup}>
-                  {backup}
-                </option>
-            ))}
-          </select>
-          <button className="button" onClick={handleRestoreBackup}>
-            Restore Backup
-          </button>
-          {restoreStatus && <p>{restoreStatus}</p>}
-        </div>
-
-        {/* Checkboxes for toggling graphs */}
-        <div className="checkbox-section">
-          <label>
-            <input
-                type="checkbox"
-                name="showLineChart"
-                checked={showCharts.showLineChart}
-                onChange={handleCheckboxChange}
-            />
-            Show Sales Over Time
-          </label>
-          <label>
-            <input
-                type="checkbox"
-                name="showBarChart"
-                checked={showCharts.showBarChart}
-                onChange={handleCheckboxChange}
-            />
-            Show Units Sold by Product
-          </label>
-          <label>
-            <input
-                type="checkbox"
-                name="showPieChart"
-                checked={showCharts.showPieChart}
-                onChange={handleCheckboxChange}
-            />
-            Show Sales by Location
-          </label>
-          <label>
-            <input
-                type="checkbox"
-                name="showDoughnutChart"
-                checked={showCharts.showDoughnutChart}
-                onChange={handleCheckboxChange}
-            />
-            Show Sales by Gender
-          </label>
-        </div>
+        {/* Side Menu */}
+        <SideMenu
+            isOpen={isSideMenuOpen}
+            onClose={() => setIsSideMenuOpen(false)}
+            file={file}
+            handleFileChange={handleFileChange}
+            handleUpload={handleUpload}
+            mergeStatus={mergeStatus}
+            backupOptions={backupOptions}
+            backupName={backupName}
+            setBackupName={setBackupName}
+            handleRestoreBackup={handleRestoreBackup}
+            restoreStatus={restoreStatus}
+            showCharts={showCharts}
+            handleCheckboxChange={handleCheckboxChange}
+        />
 
         {/* Drag and Drop Context */}
         <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="charts" direction="horizontal">
+          <Droppable droppableId="charts" direction="vertical">
             {(provided) => (
                 <div
                     className="charts-grid"
