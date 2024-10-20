@@ -17,9 +17,6 @@ build/
 # Test coverage
 coverage/
 
-# Environment variable files
-.env*
-
 # Git-related files
 .git/
 .gitignore
