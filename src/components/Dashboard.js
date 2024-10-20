@@ -1,6 +1,6 @@
 // src/components/Dashboard.js
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { Line, Bar, Pie, Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -15,7 +15,7 @@ import {
   ArcElement,
 } from 'chart.js';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import SideMenu from './SideMenu'; // Import the SideMenu component
+import SideMenu from './SideMenu';
 import './Dashboard.css';
 
 // Register the components
@@ -59,7 +59,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchSalesData = async () => {
       try {
-        const response = await axios.get('/api/sales');
+        const response = await api.get('/sales');
         setSalesData(response.data);
       } catch (err) {
         console.error('Error fetching sales data:', err);
@@ -72,7 +72,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchBackups = async () => {
       try {
-        const response = await axios.get('/api/list-backups');
+        const response = await api.get('/list-backups');
         setBackupOptions(response.data.backups);
       } catch (err) {
         console.error('Error fetching backups:', err);
@@ -95,7 +95,7 @@ const Dashboard = () => {
     const formData = new FormData();
     formData.append('file', file);
     try {
-      const uploadResponse = await axios.post('/api/upload', formData, {
+      const uploadResponse = await api.post('/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setMergeStatus(`Success: ${uploadResponse.data.message}`);
@@ -112,7 +112,7 @@ const Dashboard = () => {
       return;
     }
     try {
-      const response = await axios.post('/api/restore-backup', {
+      const response = await api.post('/restore-backup', {
         backup_name: backupName,
       });
       setRestoreStatus(response.data.message);
