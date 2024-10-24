@@ -1,23 +1,66 @@
 /* src/components/Dashboard.css */
+
 .dashboard-container {
-  padding: 20px;
   position: relative;
+  padding: 20px;
+  color: white;
+  background-color: #1B1E32;
+  min-height: 100vh;
 }
 
+/* Menu button */
+.menu-button {
+  font-size: 30px;
+  background-color: transparent;
+  color: white;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  top: 16px;
+  left: 16px;
+}
+
+/* Charts grid layout */
 .charts-grid {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around;
-  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 60px; /* To avoid overlapping with the menu button */
 }
 
 .chart-box {
-  flex: 1 1 calc(50% - 32px);
-  margin: 16px;
+  width: 48%;
+  margin-bottom: 16px;
+  background-color: #262C48;
+  padding: 16px;
+  box-sizing: border-box;
+  border-radius: 8px;
 }
 
-@media (max-width: 768px) {
-  .chart-box {
-    flex: 1 1 100%;
-  }
+.chart-box h2 {
+  margin-top: 0;
+}
+
+.chart-box canvas {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 100%;
+}
+
+/* Styling for data tables */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: white;
+}
+
+.data-table th,
+.data-table td {
+  border: 1px solid #444;
+  padding: 8px;
+  text-align: left;
+}
+
+.data-table th {
+  background-color: #262C48;
 }

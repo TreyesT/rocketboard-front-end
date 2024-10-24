@@ -1,5 +1,6 @@
 // src/components/SideMenu.js
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './SideMenu.css';
 
 const SideMenu = ({
@@ -17,11 +18,21 @@ const SideMenu = ({
                       showCharts,
                       handleCheckboxChange,
                   }) => {
+    const navigate = useNavigate();
+
     return (
         <div className={`side-menu ${isOpen ? 'open' : ''}`}>
             <button className="close-button" onClick={onClose}>
                 &times;
             </button>
+
+            {/* Merge New Data Manually Button */}
+            <div className="menu-section">
+                <button className="button" onClick={() => navigate('/data-merge')}>
+                    Merge New Data Manually
+                </button>
+            </div>
+
             {/* File upload UI */}
             <div className="upload-section">
                 <input type="file" onChange={handleFileChange} />

@@ -1,7 +1,10 @@
 // src/components/Dashboard.js
 import React, { useState, useEffect } from 'react';
-import api from '../api';
-import { Line, Bar, Pie, Doughnut } from 'react-chartjs-2';
+import {
+  Line,
+  Bar,
+  Doughnut,
+} from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,12 +12,13 @@ import {
   PointElement,
   LineElement,
   BarElement,
+  ArcElement,
   Title,
   Tooltip,
   Legend,
-  ArcElement,
 } from 'chart.js';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import api from '../api';
 import SideMenu from './SideMenu';
 import './Dashboard.css';
 
@@ -25,10 +29,10 @@ ChartJS.register(
     PointElement,
     LineElement,
     BarElement,
+    ArcElement,
     Title,
     Tooltip,
-    Legend,
-    ArcElement
+    Legend
 );
 
 const Dashboard = () => {
@@ -42,16 +46,15 @@ const Dashboard = () => {
   const [showCharts, setShowCharts] = useState({
     showLineChart: true,
     showBarChart: true,
-    showPieChart: true,
+    showPieChart: true, // This will control the table now
     showDoughnutChart: true,
   });
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
 
-  // State to manage the order of the charts
   const [chartsOrder, setChartsOrder] = useState([
     'lineChart',
     'barChart',
-    'pieChart',
+    'locationTable',
     'doughnutChart',
   ]);
 
@@ -195,7 +198,7 @@ const Dashboard = () => {
     ],
   };
 
-  // Sales by Customer Location (Pie Chart)
+  // Sales by Location (Table Data)
   const salesByLocation = dataToUse.reduce((acc, sale) => {
     const location = sale.customer.location;
     if (!acc[location]) {
@@ -205,22 +208,12 @@ const Dashboard = () => {
     return acc;
   }, {});
 
-  const pieChartData = {
-    labels: Object.keys(salesByLocation),
-    datasets: [
-      {
-        label: 'Sales by Location',
-        data: Object.values(salesByLocation),
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.6)',
-          'rgba(54, 162, 235, 0.6)',
-          'rgba(255, 206, 86, 0.6)',
-          'rgba(75, 192, 192, 0.6)',
-          'rgba(153, 102, 255, 0.6)',
-        ],
-      },
-    ],
-  };
+  const locationTableData = Object.entries(salesByLocation).map(
+      ([location, salesAmount]) => ({
+        location,
+        salesAmount,
+      })
+  );
 
   // Sales by Gender (Doughnut Chart)
   const salesByGender = dataToUse.reduce((acc, sale) => {
@@ -255,10 +248,27 @@ const Dashboard = () => {
       title: 'Units Sold by Product',
       visible: showCharts.showBarChart,
     },
-    pieChart: {
-      component: <Pie data={pieChartData} />,
+    locationTable: {
+      component: (
+          <table className="data-table">
+            <thead>
+            <tr>
+              <th>Location</th>
+              <th>Sales Amount</th>
+            </tr>
+            </thead>
+            <tbody>
+            {locationTableData.map((row, index) => (
+                <tr key={index}>
+                  <td>{row.location}</td>
+                  <td>{row.salesAmount}</td>
+                </tr>
+            ))}
+            </tbody>
+          </table>
+      ),
       title: 'Sales by Location',
-      visible: showCharts.showPieChart,
+      visible: showCharts.showPieChart, // Reuse the same toggle
     },
     doughnutChart: {
       component: <Doughnut data={doughnutChartData} />,
@@ -279,8 +289,6 @@ const Dashboard = () => {
           &#9776;
         </button>
 
-        <h1>Sales Dashboard</h1>
-
         {/* Side Menu */}
         <SideMenu
             isOpen={isSideMenuOpen}
@@ -300,12 +308,12 @@ const Dashboard = () => {
 
         {/* Drag and Drop Context */}
         <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="charts" direction="vertical">
+          <Droppable droppableId="charts">
             {(provided) => (
                 <div
                     className="charts-grid"
-                    {...provided.droppableProps}
                     ref={provided.innerRef}
+                    {...provided.droppableProps}
                 >
                   {visibleCharts.map((chartKey, index) => (
                       <Draggable key={chartKey} draggableId={chartKey} index={index}>
@@ -315,6 +323,7 @@ const Dashboard = () => {
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
+                                style={{ ...provided.draggableProps.style }}
                             >
                               <h2>{chartComponents[chartKey].title}</h2>
                               {chartComponents[chartKey].component}

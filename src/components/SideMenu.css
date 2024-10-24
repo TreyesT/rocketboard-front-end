@@ -1,11 +1,13 @@
 /* src/components/SideMenu.css */
+
 .side-menu {
     position: fixed;
     top: 0;
     left: -300px; /* Hidden by default */
     width: 300px;
     height: 100%;
-    background-color: #262C48;
+    background-color: #1B1E32; /* Darker background to match dashboard */
+    border-right: 1px solid #444; /* Light-colored line for separation */
     overflow-y: auto;
     transition: 0.3s;
     padding-top: 60px;
@@ -27,37 +29,110 @@
     cursor: pointer;
 }
 
+.menu-section,
 .upload-section,
 .backup-section,
 .checkbox-section {
     padding: 16px;
 }
 
-.upload-section input[type='file'],
-.backup-section select {
-    background-color: #1B1E32;
-    color: white;
-    border: none;
-    padding: 8px;
-    border-radius: 4px;
-    margin-right: 8px;
+/* Adjust the upload-section to align the input and button */
+.upload-section {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
 }
 
-.upload-section input[type='file']::file-selector-button {
+.upload-section input[type='file'] {
     background-color: #262C48;
     color: white;
     border: none;
     padding: 8px;
     border-radius: 4px;
+    margin-bottom: 8px;
+    width: 100%; /* Set width to match other buttons */
+}
+
+.upload-section input[type='file']::file-selector-button {
+    background-color: #4C5B7C;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
     cursor: pointer;
+}
+
+.upload-section input[type='file']::file-selector-button:hover {
+    background-color: #5C6C8C;
+}
+
+.upload-section .button {
+    width: 100%;
+}
+
+/* Adjust the button styles to have lighter colors */
+.button {
+    background-color: #4C5B7C; /* Lighter color */
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 12px;
+    font-size: 16px;
+    width: 100%; /* Full width for consistency */
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #5C6C8C;
+}
+
+.button:active {
+    background-color: #3B4C6C;
+}
+
+/* Adjust the select element styles */
+.backup-section select {
+    background-color: #262C48;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 4px;
+    width: 100%; /* Full width */
+    margin-bottom: 8px;
+}
+
+/* Labels and Headings */
+.backup-section h2 {
+    margin-top: 0;
+    color: white;
 }
 
 /* Checkboxes styling */
 .checkbox-section label {
     display: block;
     margin-bottom: 8px;
+    font-size: 14px;
 }
 
 .checkbox-section input[type='checkbox'] {
     margin-right: 8px;
+}
+
+/* Additional styles */
+.select {
+    width: 100%;
+    background-color: #262C48;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.message {
+    color: #00FF00;
+    margin-top: 8px;
 }
