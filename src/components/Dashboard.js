@@ -102,7 +102,7 @@ const Dashboard = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setMergeStatus(`Success: ${uploadResponse.data.message}`);
-      setMergedData(uploadResponse.data.mergedData);
+      // Handle the response as needed
     } catch (error) {
       setMergeStatus('Error: ' + error.message);
     }
