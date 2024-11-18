@@ -64,3 +64,14 @@
 .data-table th {
   background-color: #262C48;
 }
+
+.no-data-container {
+  text-align: center;
+  margin: 20px;
+}
+
+.no-data-message {
+  color: gray;
+  font-style: italic;
+  font-size: 18px;
+}

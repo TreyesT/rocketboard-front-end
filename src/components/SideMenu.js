@@ -26,23 +26,24 @@ const SideMenu = ({
                 &times;
             </button>
 
-            {/* Merge New Data Manually Button */}
+            {/* Manual Merge Navigation */}
             <div className="menu-section">
                 <button className="button" onClick={() => navigate('/data-merge')}>
                     Merge New Data Manually
                 </button>
             </div>
 
-            {/* File upload UI */}
+            {/* File Upload Section */}
             <div className="upload-section">
+                <h2>Upload and Merge Data</h2>
                 <input type="file" onChange={handleFileChange} />
                 <button className="button" onClick={handleUpload}>
-                    Upload and Merge Data
+                    Upload and Merge
                 </button>
-                {mergeStatus && <p>{mergeStatus}</p>}
+                {mergeStatus && <p className="status-message">{mergeStatus}</p>}
             </div>
 
-            {/* Backup and Restore functionality */}
+            {/* Backup and Restore Section */}
             <div className="backup-section">
                 <h2>Restore Previous Backup</h2>
                 <select
@@ -59,11 +60,12 @@ const SideMenu = ({
                 <button className="button" onClick={handleRestoreBackup}>
                     Restore Backup
                 </button>
-                {restoreStatus && <p>{restoreStatus}</p>}
+                {restoreStatus && <p className="status-message">{restoreStatus}</p>}
             </div>
 
-            {/* Checkboxes for toggling graphs */}
+            {/* Chart Visibility Controls */}
             <div className="checkbox-section">
+                <h2>Toggle Graph Visibility</h2>
                 <label>
                     <input
                         type="checkbox"
