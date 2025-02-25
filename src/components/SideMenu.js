@@ -28,7 +28,7 @@ const SideMenu = ({
 
             {/* Manual Merge Navigation */}
             <div className="menu-section">
-                <button className="button" onClick={() => navigate('/data-merge')}>
+                <button className="button" onClick={() => navigate('/app-sam')}>
                     Merge New Data Manually
                 </button>
             </div>
