@@ -18,6 +18,24 @@ import api from '../api';
 import SideMenu from './SideMenu';
 import './Dashboard.css';
 
+const safeAccess = (obj, path, defaultValue = null) => {
+    try {
+        if (!obj) return defaultValue;
+
+        const keys = path.split('.');
+        let current = obj;
+
+        for (const key of keys) {
+            if (current === null || current === undefined) return defaultValue;
+            current = current[key];
+        }
+
+        return current === undefined ? defaultValue : current;
+    } catch (error) {
+        return defaultValue;
+    }
+};
+
 // Register the components
 ChartJS.register(
     CategoryScale,
@@ -203,11 +221,14 @@ const Dashboard = () => {
     // Sales by Location (Table Data)
     const salesByLocation = dataToUse.length
         ? dataToUse.reduce((acc, sale) => {
-            const location = sale.customer.location;
+            // Safely access location with a default value of 'Unknown'
+            const location = safeAccess(sale, 'customer.location', 'Unknown');
+
             if (!acc[location]) {
                 acc[location] = 0;
             }
-            acc[location] += sale.sales_amount;
+            // Safely access sales_amount with a default of 0
+            acc[location] += safeAccess(sale, 'sales_amount', 0);
             return acc;
         }, {})
         : {};
@@ -222,15 +243,17 @@ const Dashboard = () => {
     // Sales by Gender (Doughnut Chart)
     const salesByGender = dataToUse.length
         ? dataToUse.reduce((acc, sale) => {
-            const gender = sale.customer.gender;
+            // Safely access gender with a default value of 'Unknown'
+            const gender = safeAccess(sale, 'customer.gender', 'Unknown');
+
             if (!acc[gender]) {
                 acc[gender] = 0;
             }
-            acc[gender] += sale.sales_amount;
+            // Safely access sales_amount with a default of 0
+            acc[gender] += safeAccess(sale, 'sales_amount', 0);
             return acc;
         }, {})
         : {};
-
     const doughnutChartData = {
         labels: Object.keys(salesByGender),
         datasets: [
