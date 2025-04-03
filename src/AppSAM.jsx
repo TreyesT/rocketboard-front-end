@@ -262,7 +262,7 @@ const FieldMapper = () => {
 
         // Navigate back to dashboard after successful merge
         setTimeout(() => {
-          navigate('/dashboard');
+          navigate('/');
         }, 2000);
       }
     } catch (err) {
@@ -424,14 +424,14 @@ const FieldMapper = () => {
             <div className="mappings-header">
               <h3>Field Mappings</h3>
               <div className="mapping-actions">
-                <button
-                    onClick={exportMappings}
-                    className="export-button"
-                    disabled={mappings.length === 0}
-                >
-                  <Save size={18} />
-                  <span>Export Mappings</span>
-                </button>
+                {/*<button*/}
+                {/*    onClick={exportMappings}*/}
+                {/*    className="export-button"*/}
+                {/*    disabled={mappings.length === 0}*/}
+                {/*>*/}
+                {/*  <Save size={18} />*/}
+                {/*  <span>Export Mappings</span>*/}
+                {/*</button>*/}
                 <button
                     onClick={processMapping}
                     className="process-button"
