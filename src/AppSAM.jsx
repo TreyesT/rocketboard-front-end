@@ -441,8 +441,8 @@ const FieldMapper = () => {
                       <span>Processing...</span>
                   ) : (
                       <>
-                        <ArrowRight size={18} />
-                        <span>Process & Return to Dashboard</span>
+                        <ArrowRight size={18}/>
+                        <span>Process</span>
                       </>
                   )}
                 </button>
