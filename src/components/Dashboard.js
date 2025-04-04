@@ -243,8 +243,8 @@ const Dashboard = () => {
     // Sales by Gender (Bar Chart now)
     const salesByGender = dataToUse.length
         ? dataToUse.reduce((acc, sale) => {
-            // Safely access gender with a default value of 'Unknown'
-            const gender = safeAccess(sale, 'customer.gender', 'Unknown');
+            // Safely access gender with a default value of 'Other'
+            const gender = safeAccess(sale, 'customer.gender', 'Other');
 
             if (!acc[gender]) {
                 acc[gender] = 0;
@@ -264,6 +264,14 @@ const Dashboard = () => {
                 backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)'],
             },
         ],
+        // Remove legend display
+        options: {
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
     };
 
     // Chart components mapping
@@ -312,7 +320,16 @@ const Dashboard = () => {
         },
         genderBarChart: {
             component: dataToUse.length ? (
-                <Bar data={genderBarChartData} />
+                <Bar
+                    data={genderBarChartData}
+                    options={{
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }}
+                />
             ) : (
                 <p className="no-data-message">No data available for Sales by Gender</p>
             ),
