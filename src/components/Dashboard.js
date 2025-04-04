@@ -1,6 +1,6 @@
 // src/components/Dashboard.js
 import React, { useState, useEffect } from 'react';
-import { Line, Bar, Doughnut } from 'react-chartjs-2';
+import { Line, Bar } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -69,7 +69,7 @@ const Dashboard = () => {
         'lineChart',
         'barChart',
         'locationTable',
-        'doughnutChart',
+        'genderBarChart',
     ]);
 
     // Fetch sales data
@@ -240,7 +240,7 @@ const Dashboard = () => {
         })
     );
 
-    // Sales by Gender (Doughnut Chart)
+    // Sales by Gender (Bar Chart now)
     const salesByGender = dataToUse.length
         ? dataToUse.reduce((acc, sale) => {
             // Safely access gender with a default value of 'Unknown'
@@ -254,7 +254,8 @@ const Dashboard = () => {
             return acc;
         }, {})
         : {};
-    const doughnutChartData = {
+
+    const genderBarChartData = {
         labels: Object.keys(salesByGender),
         datasets: [
             {
@@ -309,9 +310,9 @@ const Dashboard = () => {
             title: 'Sales by Location',
             visible: showCharts.showPieChart,
         },
-        doughnutChart: {
+        genderBarChart: {
             component: dataToUse.length ? (
-                <Doughnut data={doughnutChartData} />
+                <Bar data={genderBarChartData} />
             ) : (
                 <p className="no-data-message">No data available for Sales by Gender</p>
             ),
